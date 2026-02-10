@@ -1,0 +1,38 @@
+name: Daily Summary Automation
+on:
+  schedule:
+    - cron: '0 10 * * *' # 每天 UTC 时间 10:00 执行（北京时间 18:00）
+  workflow_dispatch: # 允许手动触发测试
+
+jobs:
+  summarize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # 获取完整历史以供 Claude 分析
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run Claude Summary
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          npm install -g @anthropic-ai/claude-code
+          git clone https://github.com/v8/v8.git
+          claude "总结今日V8项目进展并输出为 summary.md" --non-interactive
+
+      - name: Send Mail
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          subject: "每日总结报告"
+          to: yahan@iscas.ac.cn
+          from: Claude Reporter
+          body: file://summary.md
