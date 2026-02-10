@@ -1,29 +1,34 @@
-name: Claude Summary Test
+name: Test V8 Summary
 on: workflow_dispatch
 
 jobs:
-  test-claude:
+  summarize-v8:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # 必须，否则 Claude 读不到 Git 提交历史
+      # 1. 克隆 V8 仓库（仅获取最近 1 天的提交以节省空间和成本）
+      - name: Clone V8 Repository
+        run: |
+          git clone https://github.com/v8/v8.git
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
+      # 2. 运行 Claude 进行总结
       - name: Run Claude Summary
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
         run: |
-          # 1. 安装 CLI
           npm install -g @anthropic-ai/claude-code
-          git clone https://github.com/v8/v8.git
-          # 2. 执行总结任务并打印到控制台 (stdout)
-          claude "总结V8项目过去 24 小时的代码变更，用中文列出 3 条核心进展" --non-interactive > test_result.md
           
-          echo "--- Claude 输出内容如下 ---"
-          cat test_result.md
+          # 进入 v8 目录让 Claude 分析其内容
+          cd v8
+          
+          # 使用非交互模式，并指定分析 git log
+          claude "分析 v8 文件夹下最近 24 小时的 git log，用中文总结出 3 条最重要的技术变更" --non-interactive > ../v8_summary.md
+
+      # 3. 打印结果到控制台
+      - name: Display Result
+        run: cat v8_summary.md
