@@ -14,6 +14,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          
+      - name: Install Claude
+        run: npm install -g @anthropic-ai/claude-code
 
       # 2. 运行 Claude 进行总结
       - name: Run Claude Summary
@@ -21,8 +24,6 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
         run: |
-          npm install -g @anthropic-ai/claude-code
-          
           # 进入 v8 目录让 Claude 分析其内容
           cd v8
           
