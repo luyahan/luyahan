@@ -1,0 +1,29 @@
+name: Claude Summary Test
+on: workflow_dispatch
+
+jobs:
+  test-claude:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # 必须，否则 Claude 读不到 Git 提交历史
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run Claude Summary
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
+        run: |
+          # 1. 安装 CLI
+          npm install -g @anthropic-ai/claude-code
+          git clone https://github.com/v8/v8.git
+          # 2. 执行总结任务并打印到控制台 (stdout)
+          claude "总结V8项目过去 24 小时的代码变更，用中文列出 3 条核心进展" --non-interactive > test_result.md
+          
+          echo "--- Claude 输出内容如下 ---"
+          cat test_result.md
