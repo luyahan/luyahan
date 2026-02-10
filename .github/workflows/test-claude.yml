@@ -27,7 +27,7 @@ jobs:
           cd v8
           
           # 使用非交互模式，并指定分析 git log
-          claude "分析 v8 文件夹下最近 24 小时的 git log，用中文总结出 3 条最重要的技术变更" --non-interactive > ../v8_summary.md
+          claude  "总结下v8过去24小时的改动" --no-session-persistence   --print > ../v8_summary.md
 
       # 3. 打印结果到控制台
       - name: Display Result
