@@ -13,6 +13,6 @@ jobs:
           username: ${{ secrets.MAIL_USERNAME }}
           password: ${{ secrets.MAIL_PASSWORD }}
           subject: "GitHub Actions SMTP 测试"
-          to: ${{ secrets.MAIL_USERNAME }} # 发给自己进行测试
+          to: yahan@iscas.ac.cn # 发给自己进行测试
           from: GitHub Robot
           body: "如果你收到这封邮件，说明 MAIL_PASSWORD 和 SMTP 配置完全正确！"
