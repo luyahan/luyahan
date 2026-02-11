@@ -4,6 +4,8 @@ on: workflow_dispatch
 jobs:
   summarize-v8:
     runs-on: ubuntu-latest
+    permissions:
+       id-token: write
     steps:
       # 1. 克隆 V8 仓库（仅获取最近 1 天的提交以节省空间和成本）
       - name: Checkout V8
