@@ -25,17 +25,14 @@ jobs:
           
       - name: Install Claude
         run: npm install -g @anthropic-ai/claude-code
-
-      # 2. 运行 Claude 进行总结
-      - uses: anthropics/claude-code-action@v1
-        id: claude
-        timeout-minutes: 45
+  
+      - name: Run Claude Summary
         env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
-        with:
-          prompt: “总结下v8过去24小时的改动”
-          show_full_output: v8_summary.md
-          claude_code_oauth_token: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
+        run: |
+          cd v8
+          claude "总结今日V8项目进展并输出为 summary.md" --print
 
 
       # 3. 打印结果到控制台
