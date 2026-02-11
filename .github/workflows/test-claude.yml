@@ -6,9 +6,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # 1. 克隆 V8 仓库（仅获取最近 1 天的提交以节省空间和成本）
-      - name: Clone V8 Repository
-        run: |
-          git clone https://github.com/v8/v8.git
+      - name: Checkout V8
+        uses: actions/checkout@v4
+        with:
+          # 指定目标仓库为 v8/v8
+          repository: v8/v8
+          # (可选) 指定分支、标签或 commit SHA，不填则检出默认分支
+          ref: 'main' 
+          # (可选) 建议指定存放路径，避免覆盖当前工作空间
+          path: 'v8'
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
