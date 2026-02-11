@@ -32,9 +32,8 @@ jobs:
         run: |
           # 进入 v8 目录让 Claude 分析其内容
           cd v8
-          
           # 使用非交互模式，并指定分析 git log
-          claude  "总结下v8过去24小时的改动" --no-session-persistence   --print
+          claude  --print "总结下v8过去24小时的改动"
 
       # 3. 打印结果到控制台
       - name: Display Result
