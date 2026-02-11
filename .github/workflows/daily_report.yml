@@ -8,14 +8,23 @@ jobs:
   summarize:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout V8
+        uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # 获取完整历史以供 Claude 分析
+          # 指定目标仓库为 v8/v8
+          repository: v8/v8
+          # (可选) 指定分支、标签或 commit SHA，不填则检出默认分支
+          ref: 'main' 
+          # (可选) 建议指定存放路径，避免覆盖当前工作空间
+          path: 'v8'
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+  
+      - name: Install Claude
+        run: npm install -g @anthropic-ai/claude-code
 
       - name: Run Claude Summary
         env:
@@ -33,7 +42,7 @@ jobs:
           server_port: 465
           username: ${{ secrets.MAIL_USERNAME }}
           password: ${{ secrets.MAIL_PASSWORD }}
-          subject: "每日总结报告"
+          subject: "V8每日总结报告"
           to: yahan@iscas.ac.cn
           from: Claude Reporter
           body: file://summary.md
