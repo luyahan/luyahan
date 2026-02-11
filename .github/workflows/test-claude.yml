@@ -29,10 +29,10 @@ jobs:
       - name: Run Claude Summary
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
+          # ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
         run: |
           cd v8
-          claude "总结今日V8项目进展并输出为 summary.md" --print
+          claude --print "hello" 
 
 
       # 3. 打印结果到控制台
