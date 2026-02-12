@@ -7,19 +7,13 @@ jobs:
     permissions:
        contents: write
     steps:
-      # 2. 克隆 V8 仓库（仅获取最近 1 天的提交以节省空间和成本）
-      - name: Checkout V8
-        uses: actions/checkout@v4
-        with:
-          # 指定目标仓库为 v8/v8
-          repository: v8/v8
-          # (可选) 指定分支、标签或 commit SHA，不填则检出默认分支
-          ref: 'main'
-          # (可选) 建议指定存放路径，避免覆盖当前工作空间
-          path: 'v8'
-
       - name: Install Claude
         run: npm install -g @anthropic-ai/claude-code
+
+      - name: Setup jq
+        uses: dcarbone/install-jq-action@v2
+        with:
+          version: '1.7'
 
       - name: Run Claude Summary
         env:
@@ -27,10 +21,8 @@ jobs:
           ANTHROPIC_BASE_URL: ${{ vars.ANTHROPIC_BASE_URL }}
           SUMMARY_PROMPT: ${{ vars.SUMMARY_PROMPT }}
         run: |
-          cd v8
-          git log --since="24 hours ago" --stat | tee ../recent_commits.txt
-          cd ../
-          # claude --dangerously-skip-permissions  -p "$SUMMARY_PROMPT"
+          curl -s "https://api.github.com/repos/v8/v8/commits?since=$(date -d '24 hours ago' -Iseconds)" | jq '.[] | {sha: .sha, author: .commit.author.name, message: .commit.message, date: .commit.committer.date}' | tee recent_commits.txt
+          #claude --dangerously-skip-permissions  -p "$SUMMARY_PROMPT"
       
       - name: Display Summary
         env: 
