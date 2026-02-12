@@ -8,16 +8,6 @@ jobs:
   summarize:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout V8
-        uses: actions/checkout@v4
-        with:
-          # 指定目标仓库为 v8/v8
-          repository: v8/v8
-          # (可选) 指定分支、标签或 commit SHA，不填则检出默认分支
-          ref: 'main' 
-          # (可选) 建议指定存放路径，避免覆盖当前工作空间
-          path: 'v8'
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -40,9 +30,7 @@ jobs:
           ANTHROPIC_BASE_URL: ${{ vars.ANTHROPIC_BASE_URL }}
           NEWS_PROMPT: ${{ vars.NEWS_PROMPT }}
         run: |
-          cd v8
           claude --dangerously-skip-permissions  -p "$NEWS_PROMPT"
-
       # 安装 Pandoc
       - name: Install Pandoc
         run: sudo apt-get install -y pandoc
@@ -62,8 +50,6 @@ jobs:
 
       - name: Send Mail
         uses: dawidd6/action-send-mail@v3
-        env: 
-          NEWS_FILE: ${{ vars.NEWS_FILE }}
         with:
           server_address: smtp.gmail.com
           server_port: 465
