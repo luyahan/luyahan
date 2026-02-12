@@ -7,12 +7,6 @@ jobs:
     permissions:
        id-token: write
     steps:
-      # 1. 检出用户仓库（获取 summary_v8.py 脚本）
-      - name: Checkout user repo
-        uses: actions/checkout@v4
-        with:
-          path: 'repo'
-
       # 2. 克隆 V8 仓库（仅获取最近 1 天的提交以节省空间和成本）
       - name: Checkout V8
         uses: actions/checkout@v4
@@ -24,14 +18,9 @@ jobs:
           # (可选) 建议指定存放路径，避免覆盖当前工作空间
           path: 'v8'
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
+      - name: Install Claude
+        run: npm install -g @anthropic-ai/claude-code
 
-      - name: Install anthropic
-        run: pip install anthropic
-  
       - name: Run Claude Summary
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -39,7 +28,5 @@ jobs:
           SUMMARY_PROMPT: ${{ vars.SUMMARY_PROMPT }}
         run: |
           cd v8
-          # 获取最近 1 天的提交日志
-          git log --since="1 day ago" --stat > ../recent_commits.txt
-          cd ../repo
-          python3 ./summary_v8.py  ../recent_commits.txt
+          git log --since="24 hours ago" --stat > recent_commits.txt
+          claude -p "$SUMMARY_PROMPT"
