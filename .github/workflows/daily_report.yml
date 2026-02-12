@@ -10,15 +10,10 @@ jobs:
     permissions:
        contents: write
     steps:
-      - name: Checkout V8
+      - name: Checkout repo
         uses: actions/checkout@v4
         with:
-          # 指定目标仓库为 v8/v8
-          repository: v8/v8
-          # (可选) 指定分支、标签或 commit SHA，不填则检出默认分支
-          ref: 'main' 
-          # (可选) 建议指定存放路径，避免覆盖当前工作空间
-          path: 'v8'
+          path: ./repo  # 确保在正确目录
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -28,20 +23,41 @@ jobs:
       - name: Install Claude
         run: npm install -g @anthropic-ai/claude-code
 
+      - name: Setup jq
+        uses: dcarbone/install-jq-action@v2
+        with:
+          version: '1.7'
+
       - name: Run Claude Summary
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           ANTHROPIC_BASE_URL: ${{ vars.ANTHROPIC_BASE_URL }}
           SUMMARY_PROMPT: ${{ vars.SUMMARY_PROMPT }}
         run: |
-          cd v8
-          git log --since="24 hours ago" --stat > recent_commits.txt
-          claude -p "$SUMMARY_PROMPT"
+          curl -s "https://api.github.com/repos/v8/v8/commits?since=$(date -d '24 hours ago' -Iseconds)" | jq '.[] | {sha: .sha, author: .commit.author.name, message: .commit.message, date: .commit.committer.date}' > recent_commits.txt
+          claude --dangerously-skip-permissions  -p "$SUMMARY_PROMPT"
+      
 
       - name: Display Summary
         env: 
           SUMMARY_FILE: ${{ vars.SUMMARY_FILE }}
-        run: cat ./v8/$SUMMARY_FILE
+        run: cat $SUMMARY_FILE
+
+      # 安装 Pandoc
+      - name: Install Pandoc
+        run: sudo apt-get install -y pandoc
+
+      # 转换 Markdown 为 HTML
+      # --standalone 生成包含 <body> 的完整文档
+      # --self-contained 将样式嵌入 HTML
+      - name: Convert to HTML
+        env: 
+          SUMMARY_FILE: ${{ vars.SUMMARY_FILE }}
+        run: |
+          pandoc $SUMMARY_FILE \
+            --standalone \
+            --template=default.html4 \
+            -o output.html
 
       - name: Send Mail
         uses: dawidd6/action-send-mail@v3
@@ -55,4 +71,4 @@ jobs:
           subject: "V8每日总结报告"
           to: yahan@iscas.ac.cn
           from: Claude Reporter
-          body: ./v8/$SUMMARY_FILE
+          body: output.html
