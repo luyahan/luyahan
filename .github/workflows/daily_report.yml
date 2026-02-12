@@ -1,7 +1,7 @@
 name: Daily Summary Automation
 on:
   schedule:
-    - cron: '0 0   * * *' # 每天 UTC 时间 00:00 执行（北京时间 8:00）
+    - cron: '0 0 * * *' # 每天 UTC 时间 00:00 执行（北京时间 8:00）
   workflow_dispatch: # 允许手动触发测试
 
 jobs:
@@ -22,21 +22,29 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-  
+
       - name: Install Claude
         run: npm install -g @anthropic-ai/claude-code
 
       - name: Run Claude Summary
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
+          ANTHROPIC_BASE_URL: ${{ vars.ANTHROPIC_BASE_URL }}
+          SUMMARY_PROMPT: ${{ vars.SUMMARY_PROMPT }}
         run: |
-          npm install -g @anthropic-ai/claude-code
-          git clone https://github.com/v8/v8.git
-          claude "总结今日V8项目进展并输出为 summary.md" --non-interactive
+          cd v8
+          git log --since="24 hours ago" --stat > recent_commits.txt
+          claude -p "$SUMMARY_PROMPT"
+
+      - name: Display Summary
+        env: 
+          SUMMARY_FILE: ${{ vars.SUMMARY_FILE }}
+        run: cat $SUMMARY_FILE
 
       - name: Send Mail
         uses: dawidd6/action-send-mail@v3
+        env: 
+          SUMMARY_FILE: ${{ vars.SUMMARY_FILE }}
         with:
           server_address: smtp.gmail.com
           server_port: 465
@@ -45,4 +53,4 @@ jobs:
           subject: "V8每日总结报告"
           to: yahan@iscas.ac.cn
           from: Claude Reporter
-          body: file://summary.md
+          body: file://$SUMMARY_FILE

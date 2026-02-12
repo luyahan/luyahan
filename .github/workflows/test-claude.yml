@@ -30,3 +30,8 @@ jobs:
           cd v8
           git log --since="24 hours ago" --stat > recent_commits.txt
           claude -p "$SUMMARY_PROMPT"
+      
+      - name: Display Summary
+        env: 
+          SUMMARY_FILE: ${{ vars.SUMMARY_FILE }}
+        run: cat $SUMMARY_FILE
