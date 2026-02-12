@@ -1,4 +1,4 @@
-name: Daily Summary Automation
+name: Daily News Automation
 on:
   schedule:
     - cron: '0 10 * * *' # 每天 UTC 时间 00:00 执行（北京时间 8:00）
