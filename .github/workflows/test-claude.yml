@@ -28,7 +28,7 @@ jobs:
           SUMMARY_PROMPT: ${{ vars.SUMMARY_PROMPT }}
         run: |
           cd v8
-          git log --since="24 hours ago" --stat > ../recent_commits.txt
+          git log --since="24 hours ago" --stat | tee ../recent_commits.txt
           cd ../
           # claude --dangerously-skip-permissions  -p "$SUMMARY_PROMPT"
       
@@ -36,8 +36,5 @@ jobs:
         env: 
           SUMMARY_FILE: ${{ vars.SUMMARY_FILE }}
         run: |
-            ls ./
-            echo $PWD
-            ls ./v8/
             cat ./recent_commits.txt
             cat ./$SUMMARY_FILE
