@@ -1,7 +1,7 @@
 name: Daily Summary Automation
 on:
   schedule:
-    - cron: '0 0 * * *' # 每天 UTC 时间 00:00 执行（北京时间 8:00）
+    - cron: '0 23 * * *' # 每天 UTC 时间 23:00 执行（北京时间 7:00）
   workflow_dispatch: # 允许手动触发测试
 
 jobs:
