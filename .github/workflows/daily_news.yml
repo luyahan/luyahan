@@ -1,7 +1,7 @@
 name: Daily Summary Automation
 on:
   schedule:
-    - cron: '0 0 * * *' # 每天 UTC 时间 00:00 执行（北京时间 8:00）
+    - cron: '0 10 * * *' # 每天 UTC 时间 00:00 执行（北京时间 8:00）
   workflow_dispatch: # 允许手动触发测试
 
 jobs:
@@ -26,31 +26,38 @@ jobs:
       - name: Install Claude
         run: npm install -g @anthropic-ai/claude-code
 
+      - name: Install uvx
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+             curl -LsSf https://astral.sh/uv/install.sh | sh
+             claude mcp add -s user MiniMax --env MINIMAX_API_KEY=$ANTHROPIC_API_KEY --env MINIMAX_API_HOST=https://api.minimaxi.com -- uvx minimax-coding-plan-mcp -y
+
+
       - name: Run Claude Summary
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           ANTHROPIC_BASE_URL: ${{ vars.ANTHROPIC_BASE_URL }}
-          SUMMARY_PROMPT: ${{ vars.SUMMARY_PROMPT }}
+          NEWS_PROMPT: ${{ vars.NEWS_PROMPT }}
         run: |
           cd v8
-          git log --since="24 hours ago" --stat > recent_commits.txt
-          claude -p "$SUMMARY_PROMPT"
+          claude -p "$NEWS_PROMPT"
 
       - name: Display Summary
         env: 
-          SUMMARY_FILE: ${{ vars.SUMMARY_FILE }}
-        run: cat ./v8/$SUMMARY_FILE
+          NEWS_FILE: ${{ vars.NEWS_FILE }}
+        run: cat $NEWS_FILE
 
       - name: Send Mail
         uses: dawidd6/action-send-mail@v3
         env: 
-          SUMMARY_FILE: ${{ vars.SUMMARY_FILE }}
+          NEWS_FILE: ${{ vars.NEWS_FILE }}
         with:
           server_address: smtp.gmail.com
           server_port: 465
           username: ${{ secrets.MAIL_USERNAME }}
           password: ${{ secrets.MAIL_PASSWORD }}
-          subject: "V8每日总结报告"
+          subject: "GitHub每日新闻报告"
           to: yahan@iscas.ac.cn
-          from: Claude Reporter
-          body: ./v8/$SUMMARY_FILE
+          from: News Reporter
+          body: file://$NEWS_FILE

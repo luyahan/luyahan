@@ -34,4 +34,4 @@ jobs:
       - name: Display Summary
         env: 
           SUMMARY_FILE: ${{ vars.SUMMARY_FILE }}
-        run: cat $SUMMARY_FILE
+        run: cat ./v8/$SUMMARY_FILE
