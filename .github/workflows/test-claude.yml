@@ -22,7 +22,7 @@ jobs:
           SUMMARY_PROMPT: ${{ vars.SUMMARY_PROMPT }}
         run: |
           curl -s "https://api.github.com/repos/v8/v8/commits?since=$(date -d '24 hours ago' -Iseconds)" | jq '.[] | {sha: .sha, author: .commit.author.name, message: .commit.message, date: .commit.committer.date}' | tee recent_commits.txt
-          #claude --dangerously-skip-permissions  -p "$SUMMARY_PROMPT"
+          claude --dangerously-skip-permissions  -p "$SUMMARY_PROMPT"
       
       - name: Display Summary
         env: 
