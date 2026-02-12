@@ -71,4 +71,4 @@ jobs:
           subject: "V8每日总结报告"
           to: yahan@iscas.ac.cn
           from: Claude Reporter
-          body: output.html
+          html_body: file://output.html
