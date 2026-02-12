@@ -28,4 +28,5 @@ jobs:
         env: 
           SUMMARY_FILE: ${{ vars.SUMMARY_FILE }}
         run: |
+            ls
             cat ./$SUMMARY_FILE
