@@ -43,10 +43,22 @@ jobs:
           cd v8
           claude --dangerously-skip-permissions  -p "$NEWS_PROMPT"
 
-      - name: Display Summary
+      # 安装 Pandoc
+      - name: Install Pandoc
+        run: sudo apt-get install -y pandoc
+
+      # 转换 Markdown 为 HTML
+      # --standalone 生成包含 <body> 的完整文档
+      # --self-contained 将样式嵌入 HTML
+      - name: Convert to HTML
         env: 
           NEWS_FILE: ${{ vars.NEWS_FILE }}
-        run: cat $NEWS_FILE
+        run: |
+          pandoc $NEWS_FILE \
+            --standalone \
+            --template=default.html4 \
+            -o output.html
+      
 
       - name: Send Mail
         uses: dawidd6/action-send-mail@v3
@@ -60,4 +72,4 @@ jobs:
           subject: "GitHub每日新闻报告"
           to: yahan@iscas.ac.cn
           from: News Reporter
-          body: file://$NEWS_FILE
+          html_body: file://output.html
