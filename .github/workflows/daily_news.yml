@@ -41,7 +41,7 @@ jobs:
           NEWS_PROMPT: ${{ vars.NEWS_PROMPT }}
         run: |
           cd v8
-          claude -p "$NEWS_PROMPT"
+          claude --dangerously-skip-permissions  -p "$NEWS_PROMPT"
 
       - name: Display Summary
         env: 
