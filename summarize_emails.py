@@ -8,8 +8,8 @@ import tempfile
 # 配置信息
 imap_server = "mail.cstnet.cn"
 imap_port = 993
-username = "yahan@iscas.ac.cn"
-password = "IMh7!~wdi39&aE2b"
+username = os.environ.get("EMAIL_USERNAME")
+password = os.environ.get("EMAIL_PASSWORD")
 
 # 要检查的邮箱文件夹
 FOLDERS = ["INBOX", "v8-riscv", "v8-dev", "riscv"]
