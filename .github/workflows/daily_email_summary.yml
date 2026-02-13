@@ -1,0 +1,26 @@
+name: Daily Email Summary
+on:
+  schedule:
+    - cron: '0 23 * * *' # 每天 UTC 时间 23:00 执行（北京时间 7:00）
+  workflow_dispatch: # 允许手动触发测试
+
+jobs:
+  summarize-emails:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: pip install imaplib2 email
+
+      - name: Run Email Summary
+        env:
+          EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+        run: python summarize_emails.py
