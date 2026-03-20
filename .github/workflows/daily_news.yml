@@ -11,21 +11,17 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Install Claude
         run: npm install -g @anthropic-ai/claude-code
 
-      - name: Install uvx
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        run: |
-             curl -LsSf https://astral.sh/uv/install.sh | sh
-             claude mcp add -s user MiniMax --env MINIMAX_API_KEY=$ANTHROPIC_API_KEY --env MINIMAX_API_HOST=https://api.minimaxi.com -- uvx minimax-coding-plan-mcp -y
-
-
+      - name: 
+        run: npx skills add tavily-ai/skills --agent claude-code -y
+  
       - name: Run Claude Summary
         env:
+          TAVILY_API_KEY: ${{secrets.TAVILY_API_KEY}}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           ANTHROPIC_BASE_URL: ${{ vars.ANTHROPIC_BASE_URL }}
           NEWS_PROMPT: ${{ vars.NEWS_PROMPT }}
