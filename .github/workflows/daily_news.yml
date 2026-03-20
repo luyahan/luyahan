@@ -24,6 +24,10 @@ jobs:
           TAVILY_API_KEY: ${{secrets.TAVILY_API_KEY}}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           ANTHROPIC_BASE_URL: ${{ vars.ANTHROPIC_BASE_URL }}
+          ANTHROPIC_DEFAULT_HAIKU_MODEL: ${{ vars.ANTHROPIC_MODEL }}
+          ANTHROPIC_DEFAULT_OPUS_MODEL: ${{ vars.ANTHROPIC_MODEL }}
+          ANTHROPIC_DEFAULT_SONNET_MODEL: ${{ vars.ANTHROPIC_MODEL }}
+          ANTHROPIC_MODEL: ${{ vars.ANTHROPIC_MODEL }}
           NEWS_PROMPT: ${{ vars.NEWS_PROMPT }}
         run: |
           claude --dangerously-skip-permissions  -p "$NEWS_PROMPT"
