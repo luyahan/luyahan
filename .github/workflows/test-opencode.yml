@@ -33,7 +33,7 @@ jobs:
                 }
               }
             },
-            "model": "isrc/$ANTHROPIC_MODEL"
+            "model": "isrc/$ANTHROPIC_MODEL",
             "permission": {
               "edit": "allow",
               "bash": { "*": "allow" },
