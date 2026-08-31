@@ -22,12 +22,8 @@ jobs:
           cat > "$HOME/.config/opencode/opencode.json" <<EOF
           {
             "\$schema": "https://opencode.ai/config.json",
-            "model": "anthropic/$ANTHROPIC_MODEL",
-            "small_model": "anthropic/$ANTHROPIC_MODEL",
-            "autoupdate": false,
-            "share": "disabled",
             "provider": {
-              "anthropic": {
+              "isrc": {
                 "options": {
                   "apiKey": "$ANTHROPIC_API_KEY",
                   "baseURL": "$ANTHROPIC_BASE_URL"
@@ -37,6 +33,7 @@ jobs:
                 }
               }
             },
+            "model": "isrc/$ANTHROPIC_MODEL"
             "permission": {
               "edit": "allow",
               "bash": { "*": "allow" },
@@ -65,15 +62,18 @@ jobs:
         run: |
           curl -s "https://api.github.com/repos/v8/v8/commits?since=$(date -d '24 hours ago' -Iseconds)" | jq '.[] | {sha: .sha, author: .commit.author.name, message: .commit.message, date: .commit.committer.date}' > recent_commits.txt
   
-      - name: Summarize
-        env:
-          SUMMARY_PROMPT: ${{ vars.SUMMARY_PROMPT }}
+      - name: Test opencode
         run: |
-          opencode run --auto --print-logs "$SUMMARY_PROMPT"
+          opencode run --auto --print-logs "Hello"
+      # - name: Summarize
+      #   env:
+      #     SUMMARY_PROMPT: ${{ vars.SUMMARY_PROMPT }}
+      #   run: |
+      #     opencode run --auto --print-logs "$SUMMARY_PROMPT"
       
-      - name: Display Summary
-        env: 
-          SUMMARY_FILE: ${{ vars.SUMMARY_FILE }}
-        run: |
-            ls
-            cat ./$SUMMARY_FILE
+      # - name: Display Summary
+      #   env: 
+      #     SUMMARY_FILE: ${{ vars.SUMMARY_FILE }}
+      #   run: |
+      #       ls
+      #       cat ./$SUMMARY_FILE

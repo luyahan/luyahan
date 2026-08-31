@@ -55,16 +55,6 @@ jobs:
               "webfetch": "allow",
               "websearch": "allow"
             },
-            "mcp": {
-              "MiniMax": {
-                "type": "local",
-                "command": ["uvx", "minimax-coding-plan-mcp", "-y"],
-                "timeout": 30000,
-                "environment": {
-                  "MINIMAX_API_KEY": "$ANTHROPIC_API_KEY",
-                  "MINIMAX_API_HOST": "https://api.minimaxi.com"
-                }
-              },
               "Tavily": {
                 "type": "local",
                 "command": ["npx", "-y", "tavily-mcp"],
