@@ -69,7 +69,7 @@ jobs:
         env:
           SUMMARY_PROMPT: ${{ vars.SUMMARY_PROMPT }}
         run: |
-          opencode run --auto "$SUMMARY_PROMPT"
+          opencode run --auto --print-logs "$SUMMARY_PROMPT"
       
       - name: Display Summary
         env: 
