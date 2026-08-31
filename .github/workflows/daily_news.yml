@@ -13,24 +13,75 @@ jobs:
         with:
           node-version: '24'
 
-      - name: Install Claude
-        run: npm install -g @anthropic-ai/claude-code
+      - name: Install opencode
+        run: npm install -g opencode-ai
 
-      - name: 
-        run: npx skills add tavily-ai/skills --agent claude-code -y
-  
-      - name: Run Claude Summary
+      - name: Install uvx
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Setup opencode config
         env:
           TAVILY_API_KEY: ${{secrets.TAVILY_API_KEY}}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           ANTHROPIC_BASE_URL: ${{ vars.ANTHROPIC_BASE_URL }}
-          ANTHROPIC_DEFAULT_HAIKU_MODEL: ${{ vars.ANTHROPIC_MODEL }}
-          ANTHROPIC_DEFAULT_OPUS_MODEL: ${{ vars.ANTHROPIC_MODEL }}
-          ANTHROPIC_DEFAULT_SONNET_MODEL: ${{ vars.ANTHROPIC_MODEL }}
+          TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
           ANTHROPIC_MODEL: ${{ vars.ANTHROPIC_MODEL }}
+        run: |
+          mkdir -p "$HOME/.config/opencode"
+          ANTHROPIC_MODEL="${ANTHROPIC_MODEL:-MiniMax-M2.1}"
+          cat > "$HOME/.config/opencode/opencode.json" <<EOF
+          {
+            "\$schema": "https://opencode.ai/config.json",
+            "model": "anthropic/$ANTHROPIC_MODEL",
+            "small_model": "anthropic/$ANTHROPIC_MODEL",
+            "autoupdate": false,
+            "share": "disabled",
+            "provider": {
+              "anthropic": {
+                "options": {
+                  "apiKey": "$ANTHROPIC_API_KEY",
+                  "baseURL": "$ANTHROPIC_BASE_URL"
+                },
+                "models": {
+                  "$ANTHROPIC_MODEL": {}
+                }
+              }
+            },
+            "permission": {
+              "edit": "allow",
+              "bash": { "*": "allow" },
+              "webfetch": "allow",
+              "websearch": "allow"
+            },
+            "mcp": {
+              "MiniMax": {
+                "type": "local",
+                "command": ["uvx", "minimax-coding-plan-mcp", "-y"],
+                "timeout": 30000,
+                "environment": {
+                  "MINIMAX_API_KEY": "$ANTHROPIC_API_KEY",
+                  "MINIMAX_API_HOST": "https://api.minimaxi.com"
+                }
+              },
+              "Tavily": {
+                "type": "local",
+                "command": ["npx", "-y", "tavily-mcp"],
+                "timeout": 30000,
+                "environment": {
+                  "TAVILY_API_KEY": "$TAVILY_API_KEY"
+                }
+              }
+            }
+          }
+          EOF
+
+      - name: Run opencode Summary
+        env:
           NEWS_PROMPT: ${{ vars.NEWS_PROMPT }}
         run: |
-          claude --dangerously-skip-permissions  -p "$NEWS_PROMPT"
+          opencode run --auto "$NEWS_PROMPT"
       # 安装 Pandoc
       - name: Install Pandoc
         run: sudo apt-get install -y pandoc
